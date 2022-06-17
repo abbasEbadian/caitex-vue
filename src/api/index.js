@@ -17,7 +17,7 @@ export const deposit = (data) => {
         //   "payerEmail": "no_reply@alfacoins.com"
         // }
     }
-    const url = "http://82.115.16.241:8000/deposit/"
+    const url = "https://82.115.16.241:8000/deposit/"
 
     return new Promise((resolve, reject) => {
         fetch(url,{method: "post", body: JSON.stringify(d), headers: {
@@ -35,7 +35,7 @@ export const deposit = (data) => {
 }
 export const get_pair_price = (pair) =>{
     return new Promise((res, rej)=>{
-        fetch("http://82.115.16.241:8000/pair_price/",{method: "post", body: JSON.stringify({pair}), headers: {
+        fetch("https://82.115.16.241:8000/pair_price/",{method: "post", body: JSON.stringify({pair}), headers: {
             "Content-Type": "application/json"
         }}).then(response => response.json())
         .then(response =>{
