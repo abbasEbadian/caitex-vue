@@ -197,7 +197,7 @@ export default {
 	<div style="width: clamp(340px, 80%, 340px)">
 		<br><br>
 		History:
-		<a-collapse v-model:activeKey="activeKey" accordion>
+		<a-collapse v-model:activeKey="activeKey" accordion v-if="invoices.length > 0">
 			<template v-for="(f, index) in invoices" :key="index">
 				<a-collapse-panel :key="index + 1" :header="'Deposit ' + f.amount + ' ' + f.currency"
 					v-if="f.amount !== 'undefined'">
@@ -205,6 +205,7 @@ export default {
 				</a-collapse-panel>
 			</template>
 		</a-collapse>
+		<span v-else><hr> No transactions yet</span>
 
 	</div>
 </template>
