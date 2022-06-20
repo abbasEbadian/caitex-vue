@@ -1,10 +1,10 @@
-<script setup>
-import Payment from './components/Payment.vue';
+<script>
+import { RouterLink, RouterView } from 'vue-router'
 
 </script>
 
 <template>
-  <payment></payment>
+  <RouterView></RouterView>
 </template>
 
 <style>
