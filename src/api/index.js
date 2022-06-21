@@ -1,6 +1,7 @@
 const HEADERS = {
     "Content-Type": "application/json"
 }
+// const base_url = "http://localhost:8000/api/v1/"
 const base_url = "https://caitex.net/api/v1/"
 const get_url = (endpoint) =>{
     return new URL(endpoint, base_url).href
@@ -99,6 +100,20 @@ export const profile = () =>{
     const headers = { Authorization: "Token  " + token} 
     return new Promise((res, rej)=>{
         fetch(get_url("profile/"),{method: "get", headers})
+        .then(response => response.json())
+        .then(response =>{
+            return res(response)
+        })
+        .catch(e => {
+            console.log(e)
+            return rej("error")
+        })
+    })
+}
+export const assets = () =>{
+     
+    return new Promise((res, rej)=>{
+        fetch(get_url("currencies/"),{method: "get"})
         .then(response => response.json())
         .then(response =>{
             return res(response)

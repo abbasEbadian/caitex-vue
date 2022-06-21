@@ -1,19 +1,10 @@
 <script>
 import { reactive, ref, watch, h } from "vue";
-import { deposit, get_pair_price, profile, withdraw } from "../api";
+import { deposit, get_pair_price, profile, withdraw, assets } from "../api";
 import { InputNumber, Form, FormItem, Button, Space, Collapse, notification, Spin, Input } from 'ant-design-vue';
 
 
-const symbols = {
-	"bitcoin": "BTC",
-	"ethereum": "ETH",
-	"xrp": "XRP",
-	"bitcoincash": "BCH",
-	"litecoin": "LTC",
-	"dash": "DASH",
-	"tron": "TRX",
-	"litecointestnet": "LTCT",
-}
+
 export default {
 	inject:[ "BASE_URL" ],  
 	components: {
@@ -31,7 +22,9 @@ export default {
 			user: {},
 			loading: false,
 			pair_loading: false,
-			currencies: [{ label: "LiteCoin Testnet", value: "litecointestnet" }]
+			currencies: [{ label: "LiteCoin Testnet", value: "litecointestnet" }],
+			rawCurrencies: []
+
 		}
 	},
 	methods: {
@@ -97,21 +90,9 @@ export default {
 		}
 	},
 	watch: {
-		'formState.test'(newVal) {
-			this.currencies = !newVal ? [
-				{ label: "Bitcoin", value: "bitcoin" },
-				{ label: "Ethereum", value: "ethereum" },
-				{ label: "XRP", value: "xrp" },
-				{ label: "Bitcoin Cash", value: "bitcoincash" },
-				{ label: "Litecoin", value: "litecoin" },
-				{ label: "DASH", value: "dash" },
-				{ label: "TRON", value: "tron" },
-			] : [{ label: "LiteCoin Testnet", value: "litecointestnet" }]
-			this.formState.currency = !newVal ? "bitcoin" : "litecointestnet"
-			this.pair = symbols[!newVal ? "bitcoin" : "litecointestnet"] + "_USD"
-		},
+		
 		'formState.currency'(newVal){
-			this.pair =  "USD_" + symbols[newVal] 
+			this.pair =  "USD_" + this.rawCurrencies.find(i=>i.alfaname === newVal).symbol 
 			this.pair_loading = true
 			get_pair_price(this.pair).then(e => {
 				if (e.error !== 1) {
@@ -133,8 +114,8 @@ export default {
 		const pair_value = ref(0)
 		const formState = reactive({
 			amount: 1,
-			currency: "litecointestnet",
-			test: 1,
+			currency: "",
+			test: 0,
 			action:"deposit",
 			withdrawAddress: ""
 		});
@@ -175,6 +156,13 @@ export default {
 	mounted() {
 		
 		profile().then(user => this.user = user)
+		assets().then(assets => {
+			const c = assets.map(item=>({label: item.name, value: item.alfaname}))
+			this.currencies = c
+			this.rawCurrencies = assets
+			this.formState.currency = c[0].value
+		})
+
 		.catch(e => console.log(e))
 		this.pair_loading = true
 		get_pair_price(this.pair).then(e => {
@@ -209,12 +197,12 @@ export default {
 					</a-radio-group>
 				</a-form-item>
 
-				<a-form-item name="amount">
+				<!-- <a-form-item name="amount">
 					<a-radio-group v-model:value="formState.test" style="width: 100%">
 						<a-radio-button :value="1">Test</a-radio-button>
 						<a-radio-button :value="0">Real</a-radio-button>
 					</a-radio-group>
-				</a-form-item>
+				</a-form-item> -->
 
 				<a-form-item label="Currency" name="currency" :rules="[{ required: false }]">
 					<a-select ref="select" v-model:value="formState.currency" :options="currencies">
@@ -347,12 +335,15 @@ label {
 }
 
 button {
-	min-width: 300px;
+	width: 100%;
 	margin-top: 16px;
 	border: 1px solid #ddd;
 	background-color: crimson;
 	color: white;
 	padding-block: 8px;
 	cursor: pointer;
+}
+.form{
+	max-width: 100%;
 }
 </style>
